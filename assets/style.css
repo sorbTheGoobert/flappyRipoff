@@ -1,0 +1,45 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: aqua;
+    display: flex;
+}
+
+#grass {
+    background-color: greenyellow;
+    height: 15vh;
+    width: 100vw;
+    align-self: flex-end;
+}
+
+#bird {
+    margin-left: 50px;
+    width: 75px;
+    height: 75px;
+    background-color: yellow;
+    position: absolute;
+    top: calc((100vh - 15vh) / 2 - 50px);
+}
+
+.top-pillar {
+    width: 100px;
+    height: calc((100vh - 15vh) / 2 - 200px);
+    background-color: green;
+    position: absolute;
+    top: 0px;
+}
+
+.bottom-pillar {
+    width: 100px;
+    height: calc((100vh - 15vh) / 2 - 200px);
+    background-color: green;
+    position: absolute;
+    top: calc((100vh - 15vh) / 2 + 200px);
+}
