@@ -8,34 +8,43 @@ var jumpStarted = false;
 var broke = false;
 var gap = bottomPillar[0].offsetTop - (topPillar[0].offsetHeight + topPillar[0].offsetTop); //(not sure if this works but probably no)
 var gameStarted = false;
+var pillarGenerationInterval;
+var pillarMovementInterval;
+// var timeSinceJumped = 0;
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function checkCollision(object1, object2, n) {
+function checkCollision(object1, object2/*, n*/) {
     //i totallly did not rip this from my previous project. (definetly (certainly (source: just trust me))) 
-    if(n == 1){ // 1 if vertical
-        if(
-            object1.offsetTop + object1.offsetHeight >= object2.offsetTop &&
-            object2.offsetTop + object2.offsetHeight >= object1.offsetTop
-        ){
+    // if(n == 1){ // 1 if vertical
+    //     if(
+    //         object1.offsetTop + object1.offsetHeight >= object2.offsetTop &&
+    //         object2.offsetTop + object2.offsetHeight >= object1.offsetTop
+    //     ){
             
-        }
-    }else if(n == 2){ // 2 if horizontal 
-        if (
+    //     }
+    // }else 
+    //if(n == 2){ // 2 if horizontal 
+    if (
+        (
             object1.offsetLeft + object1.offsetWidth >= object2.offsetLeft &&
             object2.offsetLeft + object2.offsetWidth >= object1.offsetLeft
-        ) {
-            
-        }
+        ) &&
+        (
+            object1.offsetTop + object1.offsetHeight >= object2.offsetTop &&
+            object2.offsetTop + object2.offsetHeight >= object1.offsetTop
+        )
+    ) {
+        return true;
     }
+    //}
 }
 
-async function computeHeight() {
+async function computeHeight(i) {
     broke = false;
     jumpStarted = true;
     var flappyOgPos = flappy.offsetTop
-    var i = 0;
     while(true){
         if(jumpStarted == false){
             broke = true;
@@ -59,15 +68,28 @@ async function computeHeight() {
 }
 
 async function jump() {
-    if(event.key == " " || event.key == "ArrowUp"){
+    if(event.key == " " || event.key == "ArrowUp" || event.key == "w"){
         if(jumpStarted == false) {
-            computeHeight();
+            computeHeight(0);
         }else{
             jumpStarted = false;
             for(var i = 0; i <= 2000; i+=2){
                 await sleep(1);
                 if(broke){
-                    computeHeight();
+                    computeHeight(0);
+                    break;
+                }
+            }
+        }
+    }else if(event.key == "s" || event.key == "ArrowDown"){
+        if(jumpStarted == false) {
+            computeHeight(1000);
+        }else{
+            jumpStarted = false;
+            for(var i = 0; i <= 2000; i+=2){
+                await sleep(1);
+                if(broke){
+                    computeHeight(1000);
                     break;
                 }
             }
@@ -135,17 +157,38 @@ function spawnPillars() {
     pillarCount++;
 }
 
+function gameLost() {
+    clearInterval(pillarGenerationInterval);
+    clearInterval(pillarMovementInterval);
+    clearInterval(pillarCollisionCheck);
+    broke = true;
+    jumpStarted = false;
+}
+
+function losingConditionCheck() {
+    for(var i = 0; i < topPillar.length; i++){
+        if(
+            checkCollision(flappy, topPillar[i]) ||
+            checkCollision(flappy, bottomPillar[i])
+        ){
+            console.log("Skill issue");
+            gameLost();
+        }
+    }
+}
+
 function movePillars() {
     for(var i = 0; i < topPillar.length; i++){
-        topPillar[i].style.left = `${topPillar[i].offsetLeft - 1}px`
-        bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - 1}px`
+        topPillar[i].style.left = `${topPillar[i].offsetLeft - 5}px`
+        bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - 5}px`
     }
 }
 
 function start() {
     if(!gameStarted){
-        setInterval(spawnPillars, 10);
-        setInterval(movePillars, 1);
+        pillarGenerationInterval = setInterval(spawnPillars, 10);
+        pillarMovementInterval = setInterval(movePillars, 1);
+        pillarCollisionCheck = setInterval(losingConditionCheck, 10);
         gameStarted = true;
     }
 }
