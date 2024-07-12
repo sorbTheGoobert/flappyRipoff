@@ -30,24 +30,16 @@ body {
 
 .top-pillar {
     width: 100px;
-    height: calc((100vh - 15vh) / 2 - 200px);
+    height: 100vh;
     background-color: green;
     position: absolute;
-    top: 0px;
+    top: -70vh;
 }
 
 .bottom-pillar {
     width: 100px;
-    height: calc((100vh - 15vh) / 2 - 200px);
+    height: 100vh;
     background-color: green;
     position: absolute;
-    top: calc((100vh - 15vh) / 2 + 200px);
-}
-
-#button {
-    position: absolute;
-    width: 100px;
-    left: calc((100vw - 100px)/2);
-    align-self: center;
-    justify-self: center;
+    top: 70vh;
 }

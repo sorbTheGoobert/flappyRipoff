@@ -1,13 +1,34 @@
 var flappy = document.getElementById("bird");
-var groundHeight = document.getElementById("grass").offsetHeight;
+// var groundPos = document.getElementById("grass").offsetTop;
 var topPillar = document.getElementsByClassName("top-pillar");
 var bottomPillar = document.getElementsByClassName("bottom-pillar");
-var devHeight = document.body.offsetHeight;
-var devWidth = document.body.offsetWidth;
+const devHeight = document.body.offsetHeight;
+const devWidth = document.body.offsetWidth;
 var jumpStarted = false;
 var broke = false;
+var gap = bottomPillar[0].offsetTop - (topPillar[0].offsetHeight + topPillar[0].offsetTop); //(not sure if this works but probably no)
+var gameStarted = false;
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function checkCollision(object1, object2, n) {
+    //i totallly did not rip this from my previous project. (definetly (certainly (source: just trust me))) 
+    if(n == 1){ // 1 if vertical
+        if(
+            object1.offsetTop + object1.offsetHeight >= object2.offsetTop &&
+            object2.offsetTop + object2.offsetHeight >= object1.offsetTop
+        ){
+            
+        }
+    }else if(n == 2){ // 2 if horizontal 
+        if (
+            object1.offsetLeft + object1.offsetWidth >= object2.offsetLeft &&
+            object2.offsetLeft + object2.offsetWidth >= object1.offsetLeft
+        ) {
+            
+        }
+    }
 }
 
 async function computeHeight() {
@@ -20,11 +41,19 @@ async function computeHeight() {
             broke = true;
             break;
         }else{
-            flappy.style.top = `${flappyOgPos + (((i - 500) * (i - 500)) / 2500 - 100)}px`;
-            // console.log(flappy.offsetTop);
-            await sleep(2);
+            if(flappy.offsetTop < 0){
+                flappy.style.top = 0;
+                i = 1000;
+            }else if(flappy.offsetTop + flappy.offsetHeight > devHeight){
+                flappy.style.top = `${devHeight - flappy.offsetHeight}px`;
+                broke = true
+                jumpStarted = false;
+            }else{
+                flappy.style.top = `${flappyOgPos + (((i - 500) * (i - 500)) / 2500 - 100)}px`;
+            }
+            await sleep(1);
         }
-        i+=2;
+        i+=8;
     }
     jumpStarted = false;
 }
@@ -38,18 +67,85 @@ async function jump() {
             for(var i = 0; i <= 2000; i+=2){
                 await sleep(1);
                 if(broke){
-                computeHeight();
-                break;
+                    computeHeight();
+                    break;
                 }
             }
         }
     }
 }
 
-function altjump(gravity) {
-    
+async function altjump() {
+    if(jumpStarted == false) {
+        computeHeight();
+    }else{
+        jumpStarted = false;
+        for(var i = 0; i <= 2000; i+=2){
+            await sleep(1);
+            if(broke){
+                computeHeight();
+                break;
+            }
+        }
+    }
+}
+
+
+var pillarCount = 0;
+const ogPillarPos = topPillar[0].offsetTop;
+const ogVisibleHeight = document.getElementById("height").offsetHeight;
+
+function spawnPillars() {
+    if(pillarCount != 0){
+        for(var i = 0; i < topPillar.length; i++){
+            var offsetRNG = Math.floor(Math.random() * ogVisibleHeight);
+            var sideRNG = Math.floor(Math.random() * 2);
+            if(topPillar[i].offsetLeft <= -100){
+                if(i != 0){
+                    topPillar[i].style.left = `${topPillar[i-1].offsetLeft + 600}px`;
+                    bottomPillar[i].style.left = `${bottomPillar[i-1].offsetLeft + 600}px`;
+                }else{
+                    topPillar[i].style.left = `${topPillar[topPillar.length - 1].offsetLeft + 600}px`;
+                    bottomPillar[i].style.left = `${bottomPillar[bottomPillar.length - 1].offsetLeft + 600}px`;
+                }
+                if(sideRNG % 2 == 0){
+                    topPillar[i].style.top = `${ogPillarPos + offsetRNG}px`;
+                    bottomPillar[i].style.top = `${topPillar[i].offsetTop + topPillar[i].offsetHeight + gap}px`;
+                }else{
+                    topPillar[i].style.top = `${ogPillarPos - offsetRNG}px`;
+                    bottomPillar[i].style.top = `${topPillar[i].offsetTop + topPillar[i].offsetHeight + gap}px`;
+                }
+            }
+        }
+    }else{
+        for(var i = 0; i < topPillar.length; i++) {
+            var offsetRNG = Math.floor(Math.random() * ogVisibleHeight);
+            var sideRNG = Math.floor(Math.random() * 2);
+            topPillar[i].style.left = `${devWidth + 600 * i}px`;
+            bottomPillar[i].style.left = `${devWidth + 600 * i}px`;
+            if(sideRNG % 2 == 0){
+                topPillar[i].style.top = `${ogPillarPos + offsetRNG}px`;
+                bottomPillar[i].style.top = `${topPillar[i].offsetTop + topPillar[i].offsetHeight + gap}px`;
+            }else{
+                topPillar[i].style.top = `${ogPillarPos - offsetRNG}px`;
+                bottomPillar[i].style.top = `${topPillar[i].offsetTop + topPillar[i].offsetHeight + gap}px`;
+            }
+        }
+    }
+    pillarCount++;
+}
+
+function movePillars() {
+    for(var i = 0; i < topPillar.length; i++){
+        topPillar[i].style.left = `${topPillar[i].offsetLeft - 1}px`
+        bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - 1}px`
+    }
 }
 
 function start() {
-    
+    if(!gameStarted){
+        setInterval(spawnPillars, 10);
+        setInterval(movePillars, 1);
+        gameStarted = true;
+    }
 }
