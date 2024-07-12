@@ -43,3 +43,11 @@ body {
     position: absolute;
     top: calc((100vh - 15vh) / 2 + 200px);
 }
+
+#button {
+    position: absolute;
+    width: 100px;
+    left: calc((100vw - 100px)/2);
+    align-self: center;
+    justify-self: center;
+}
