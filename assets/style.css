@@ -10,6 +10,8 @@ body {
     overflow: hidden;
     background-color: aqua;
     display: flex;
+    font-family: "Pixelify+Sans";
+    color: white;
 }
 
 #grass {
@@ -34,6 +36,7 @@ body {
     background-color: green;
     position: absolute;
     top: -70vh;
+    opacity: 0;
 }
 
 .bottom-pillar {
@@ -42,4 +45,14 @@ body {
     background-color: green;
     position: absolute;
     top: 70vh;
+    opacity: 0;
+}
+
+#score {
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 32px;
+    text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
 }

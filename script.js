@@ -10,6 +10,7 @@ var gap = bottomPillar[0].offsetTop - (topPillar[0].offsetHeight + topPillar[0].
 var gameStarted = false;
 var pillarGenerationInterval;
 var pillarMovementInterval;
+var jumpable = true;
 // var timeSinceJumped = 0;
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -58,59 +59,66 @@ async function computeHeight(i) {
                 broke = true
                 jumpStarted = false;
             }else{
-                flappy.style.top = `${flappyOgPos + (((i - 500) * (i - 500)) / 2500 - 100)}px`;
+                flappy.style.top = `${flappyOgPos + ( ( ( ( i - 500 ) * ( i - 500 ) ) / 2500 - 100 ) * 1.6) }px`;
             }
             await sleep(1);
         }
-        i+=8;
+        i+=11;
     }
     jumpStarted = false;
 }
 
 async function jump() {
-    if(event.key == " " || event.key == "ArrowUp" || event.key == "w"){
-        if(jumpStarted == false) {
-            computeHeight(0);
-        }else{
-            jumpStarted = false;
-            for(var i = 0; i <= 2000; i+=2){
-                await sleep(1);
-                if(broke){
-                    computeHeight(0);
-                    break;
+    if(jumpable == true){
+        if(event.key == " " || event.key == "ArrowUp" || event.key == "w"){
+            if(jumpStarted == false) {
+                computeHeight(0);
+            }else{
+                jumpStarted = false;
+                for(var i = 0; i <= 2000; i+=2){
+                    await sleep(1);
+                    if(broke){
+                        computeHeight(0);
+                        break;
+                    }
                 }
             }
         }
-    }else if(event.key == "s" || event.key == "ArrowDown"){
-        if(jumpStarted == false) {
-            computeHeight(1000);
-        }else{
-            jumpStarted = false;
-            for(var i = 0; i <= 2000; i+=2){
-                await sleep(1);
-                if(broke){
-                    computeHeight(1000);
-                    break;
+        else if(event.key == "s" || event.key == "ArrowDown"){
+            if(jumpStarted == false) {
+                computeHeight(1000);
+            }else{
+                jumpStarted = false;
+                for(var i = 0; i <= 2000; i+=2){
+                    await sleep(1);
+                    if(broke){
+                        computeHeight(1000);
+                        break;
+                    }
                 }
             }
         }
+    }
+    else{
+        await sleep(5000);
+        location.reload();
     }
 }
 
-async function altjump() {
-    if(jumpStarted == false) {
-        computeHeight();
-    }else{
-        jumpStarted = false;
-        for(var i = 0; i <= 2000; i+=2){
-            await sleep(1);
-            if(broke){
-                computeHeight();
-                break;
-            }
-        }
-    }
-}
+// async function altjump() {
+//     if(jumpStarted == false) {
+//         computeHeight();
+//     }else{
+//         jumpStarted = false;
+//         for(var i = 0; i <= 2000; i+=2){
+//             await sleep(1);
+//             if(broke){
+//                 computeHeight();
+//                 break;
+//             }
+//         }
+//     }
+// }
 
 
 var pillarCount = 0;
@@ -161,7 +169,7 @@ function gameLost() {
     clearInterval(pillarGenerationInterval);
     clearInterval(pillarMovementInterval);
     clearInterval(pillarCollisionCheck);
-    broke = true;
+    jumpable = false;
     jumpStarted = false;
 }
 
@@ -189,6 +197,10 @@ function start() {
         pillarGenerationInterval = setInterval(spawnPillars, 10);
         pillarMovementInterval = setInterval(movePillars, 1);
         pillarCollisionCheck = setInterval(losingConditionCheck, 10);
+        for(var i = 0; i < topPillar.length; i++){
+            topPillar[i].style.opacity = 1;
+            bottomPillar[i].style.opacity = 1;
+        }
         gameStarted = true;
     }
 }
