@@ -49,10 +49,14 @@ body {
 }
 
 #score {
+    position: absolute;
     font-family: "Pixelify Sans", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
     font-weight: 700;
-    font-size: 32px;
+    font-size: 64px;
     text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+    text-align: center;
+    width: 100vw;
+    z-index: 999999999;
 }

@@ -11,7 +11,25 @@ var gameStarted = false;
 var pillarGenerationInterval;
 var pillarMovementInterval;
 var jumpable = true;
+var closestPillarPos;
+var closestPillarIndex = 0;
+var score = 0;
+var scorePanel = document.getElementById("score");
 // var timeSinceJumped = 0;
+
+function findClosestPillar() {
+    if(closestPillarPos < flappy.offsetLeft){
+        if(closestPillarIndex < topPillar.length - 1){
+            closestPillarIndex++;
+        }else{
+            closestPillarIndex = 0;
+        }
+        addScore();
+        console.log(closestPillarIndex);
+    }
+}
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -99,10 +117,10 @@ async function jump() {
             }
         }
     }
-    else{
-        await sleep(5000);
-        location.reload();
-    }
+    // else{
+    //     await sleep(5000);
+    //     location.reload();
+    // }
 }
 
 // async function altjump() {
@@ -161,6 +179,7 @@ function spawnPillars() {
                 bottomPillar[i].style.top = `${topPillar[i].offsetTop + topPillar[i].offsetHeight + gap}px`;
             }
         }
+        closestPillarPos = topPillar[closestPillarIndex].offsetLeft + topPillar[closestPillarIndex].offsetWidth;
     }
     pillarCount++;
 }
@@ -174,14 +193,12 @@ function gameLost() {
 }
 
 function losingConditionCheck() {
-    for(var i = 0; i < topPillar.length; i++){
-        if(
-            checkCollision(flappy, topPillar[i]) ||
-            checkCollision(flappy, bottomPillar[i])
-        ){
-            console.log("Skill issue");
-            gameLost();
-        }
+    if(
+        checkCollision(flappy, topPillar[closestPillarIndex]) ||
+        checkCollision(flappy, bottomPillar[closestPillarIndex])
+    ){
+        console.log("Skill issue");
+        gameLost();
     }
 }
 
@@ -190,6 +207,12 @@ function movePillars() {
         topPillar[i].style.left = `${topPillar[i].offsetLeft - 5}px`
         bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - 5}px`
     }
+    closestPillarPos = topPillar[closestPillarIndex].offsetLeft + topPillar[closestPillarIndex].offsetWidth;
+}
+
+function addScore() {
+    score++;
+    scorePanel.innerHTML = score;
 }
 
 function start() {
@@ -197,6 +220,7 @@ function start() {
         pillarGenerationInterval = setInterval(spawnPillars, 10);
         pillarMovementInterval = setInterval(movePillars, 1);
         pillarCollisionCheck = setInterval(losingConditionCheck, 10);
+        pillarPosFound = setInterval(findClosestPillar, 10);
         for(var i = 0; i < topPillar.length; i++){
             topPillar[i].style.opacity = 1;
             bottomPillar[i].style.opacity = 1;
