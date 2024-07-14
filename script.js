@@ -15,6 +15,7 @@ var closestPillarPos;
 var closestPillarIndex = 0;
 var score = 0;
 var scorePanel = document.getElementById("score");
+var speed = 2;
 // var timeSinceJumped = 0;
 
 function findClosestPillar() {
@@ -204,8 +205,8 @@ function losingConditionCheck() {
 
 function movePillars() {
     for(var i = 0; i < topPillar.length; i++){
-        topPillar[i].style.left = `${topPillar[i].offsetLeft - 5}px`
-        bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - 5}px`
+        topPillar[i].style.left = `${topPillar[i].offsetLeft - speed}px`
+        bottomPillar[i].style.left = `${bottomPillar[i].offsetLeft - speed}px`
     }
     closestPillarPos = topPillar[closestPillarIndex].offsetLeft + topPillar[closestPillarIndex].offsetWidth;
 }
@@ -215,16 +216,47 @@ function addScore() {
     scorePanel.innerHTML = score;
 }
 
+function phase1() {
+    pillarGenerationInterval = setInterval(spawnPillars, 10);
+    pillarMovementInterval = setInterval(movePillars, 1);
+    pillarCollisionCheck = setInterval(losingConditionCheck, 10);
+    pillarPosFound = setInterval(findClosestPillar, 10);
+}
+async function phase2() {
+    clearInterval(pillarGenerationInterval);
+    clearInterval(pillarCollisionCheck);
+    clearInterval(pillarMovementInterval);
+    clearInterval(pillarPosFound);
+    await sleep(5000);
+    pillarGenerationInterval = setInterval(spawnPillars, 10);
+    pillarPosFound = setInterval(findClosestPillar, 10);
+    pillarMovementInterval = setInterval(movePillars, 1);
+    pillarCollisionCheck = setInterval(losingConditionCheck, 10);
+    for(var i = 0; i<=4; i+=.5){
+        speed = i;
+        await sleep(100);
+    }
+    speed = 4;
+}
+
+async function phase2Search() {
+    while (true){
+        if(score == 50){
+            phase2();
+            break;
+        }
+        await sleep(10);
+    }
+}
+
 function start() {
     if(!gameStarted){
-        pillarGenerationInterval = setInterval(spawnPillars, 10);
-        pillarMovementInterval = setInterval(movePillars, 1);
-        pillarCollisionCheck = setInterval(losingConditionCheck, 10);
-        pillarPosFound = setInterval(findClosestPillar, 10);
         for(var i = 0; i < topPillar.length; i++){
             topPillar[i].style.opacity = 1;
             bottomPillar[i].style.opacity = 1;
         }
+        phase1();
+        phase2Search();
         gameStarted = true;
     }
 }
